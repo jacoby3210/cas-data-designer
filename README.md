@@ -3,7 +3,7 @@ A set of auxiliary utilities for game design and development.
 
 ## Core Settings
 
-- ai_counter_locale_table - stores the autoincrement counter for strings with localized textж
+- ai_counter_locale_table - stores the autoincrement counter for strings with localized text.
 - show_lid_columns - store current visibility state for lid columns.
 
 ## Main Principles
@@ -22,14 +22,20 @@ Table Header:
 
 ## Steps for adding macros to the ribbon in WPS Office:
 
-1) Open WPS Office Spreadsheets.
-2) Click the Developer Tab (depending on your version of WPS).
-3) Click “Visual Basic Editor”
-4) Modules -> right click -> import 'add-row.bas' and 'toggle-lid-columns.bas'
-5) Or Open 
+1) Copy 'src\excel\DesignDataPrototype.xlsm' and 'src\python\compile.py' in work folder.
 
-6) After creating a macro, go to File → Options (or WPS Settings).
-7) In the window that opens, select the “Customize Ribbon” or “Customize Toolbar” section.
-8) Find or create a new tab or group on the ribbon:
-9) Click “Create Tab” and name it (for example, “Game Data Designer”).
-10) Add 'Add Row' and 'ToggleVisibility' buttons
+2) Open DesignDataPrototype.xlsm (enable macros)
+  - ctrl+shift+z - call macro that switches visibility of columns with data type lid
+  - ctrl+shift+x - call macro that adds a new row to the table with data 
+    - automatically generates new unique lid 
+    - copy the range for editing for columns ref (from first table data row).
+
+3) Create new Table (just copy from @examples)
+  - columns with name 'id' are automatically filled with the first available value using the autoincrement counter (from column header).
+  - columns with name 'label' are automatically filled with the row id.
+  - columns with type 'lid' are automatically filled with the first available value using the autoincrement counter (from settings -> ai_counter_locale_table).
+  - other data columns of the new row copy data from the first row.
+  - make sure that for columns with data type ref, the first row of the table contains a drop-down list with the required data range.
+
+4) Save as .xlsx (current version not supported .xlsm).
+5) Run compile.py which created .json files for future use
