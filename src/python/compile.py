@@ -4,71 +4,63 @@ import openpyxl
 import os
 
 # Функция для конвертации таблицы в CSV и JSON
-def convert_table_to_csv_json(table_name, table_data, csv_locale_writer):
+def convert_table_to_json(table_name, table_data, json_locale_data):
 
   # Подготовка заголовков (удаление текста после двоеточия)
-  columns_all = table_data[0]
   column_names = []
   column_indices_with_data = []
   column_indices_with_locales = []
   column_indices_with_refs = []
 
-  for i, header in enumerate(columns_all):
-    if isinstance(header, str):
+  for i, header in enumerate(table_data[0]):
       column_names.append(header.split(":")[0])
       column_type = header.split(":")[1]
       
-      if 'formula' in column_type.lower():
-        continue  # Пропускаем столбцы с "formula" в заголовке
-      elif 'ltext' in column_type.lower():
-        column_indices_with_locales.append(i)
-      elif 'ref' in column_type.lower():
-        column_indices_with_refs.append(i)
-      else:
-        column_indices_with_data.append(i)
+      if 'formula' in column_type.lower(): continue  # Пропускаем столбцы с "formula" в заголовке
+      elif 'ltext' in column_type.lower(): column_indices_with_locales.append(i)
+      elif 'ref' in column_type.lower():   column_indices_with_refs.append(i)
+      else: column_indices_with_data.append(i)
 
   # Запись данных
-  json_data = []
+  json_table_data = []
   json_path = os.path.join(output_dir, f'{table_name}.json')
   for row in table_data[1:]:
-    json_data.append(
+    # Запись основных данных в именной файл
+    json_table_data.append(
       {column_names[i]: row[i] for i in column_indices_with_data} | 
       {column_names[i]: int(row[i].split(":")[0]) for i in column_indices_with_refs}
     )
 
-    # Запись локализованного текста в отдельный CSV
-    if csv_locale_writer and column_indices_with_locales:
-      for i in column_indices_with_locales:
-        csv_locale_writer.writerow([row[i-1], row[i], columns_all[i].split(":")[0], table_name])
+    for i in column_indices_with_locales:
+      json_locale_data[row[i-1]] = {"text":row[i], "column":column_names[i], "table":table_name}
 
   # Запись данных в JSON
   with open(json_path, 'w', encoding='utf-8') as json_file:
-    json.dump(json_data, json_file, ensure_ascii=False, indent=2)
+    json.dump(json_table_data, json_file, ensure_ascii=False, indent=2)
 
   print(f'Таблица {table_name} успешно преобразована в JSON')
 
 # Функция для обработки каждого WorkBook Excel
 def parse_wb(wb_path):
+  json_locale_data = {}
   wb_handler = openpyxl.load_workbook(wb_path, keep_links=True, keep_vba=True)
 
-  # Открываем файл для хранения локализованного текста
-  csv_locale_file_path = os.path.join(output_dir, f'locale.csv')
-  with open(csv_locale_file_path, mode='w', newline='', encoding='utf-8') as locale_file:
-    csv_locale_writer = csv.writer(locale_file)
-    csv_locale_writer.writerow(["id", "label", "column", "name"])
+  # Обрабатываем каждую таблицу в файле
+  for wb_sheet_name in wb_handler.sheetnames:
+    # Игнорируем листы, начинающиеся с символа '@'
+    if wb_sheet_name.startswith('@'):
+      print(f'Лист {wb_sheet_name} пропущен (начинается с символа @)')
+      continue
 
-    # Обрабатываем каждую таблицу в файле
-    for wb_sheet_name in wb_handler.sheetnames:
-      # Игнорируем листы, начинающиеся с символа '@'
-      if wb_sheet_name.startswith('@'):
-        print(f'Лист {wb_sheet_name} пропущен (начинается с символа @)')
-        continue
+    wb_sheet_handler = wb_handler[wb_sheet_name]
+    for table_name, table in wb_sheet_handler.tables.items():
+      table_range = wb_sheet_handler[table]
+      table_data = [[cell.value for cell in row] for row in table_range]
+      convert_table_to_json(table_name, table_data, json_locale_data)
 
-      wb_sheet_handler = wb_handler[wb_sheet_name]
-      for table_name, table in wb_sheet_handler.tables.items():
-        table_range = wb_sheet_handler[table]
-        table_data = [[cell.value for cell in row] for row in table_range]
-        convert_table_to_csv_json(table_name, table_data, csv_locale_writer)
+  json_locale_path = os.path.join(output_dir, f'locale.json')
+  with open(json_locale_path, 'w', encoding='utf-8') as json_file:
+    json.dump(json_locale_data, json_file, ensure_ascii=False, indent=2)
 
 # Настройка среды выполнения
 input_dir = os.getcwd()
