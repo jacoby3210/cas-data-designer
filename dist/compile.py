@@ -22,11 +22,11 @@ def convert_table_to_json(table_name, table_data, json_locale_data):
       else: column_indices_with_data.append(i)
 
   # prepare data
-  json_table_data = []
+  json_table_data = {}
   for row in table_data[1:]:
     
     # handle sheet data 
-    json_table_data.append(
+    json_table_data[row[0]] = (
       {column_names[i]: row[i] for i in column_indices_with_data} | 
       {column_names[i]: int(row[i].split(":")[0]) for i in column_indices_with_refs}
     )
