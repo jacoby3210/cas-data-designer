@@ -7,6 +7,7 @@ import os
 def convert_table_to_json(table_name, table_data, json_locale_data):
 
   # Подготовка заголовков (удаление текста после двоеточия)
+  
   column_names = []
   column_indices_with_data = []
   column_indices_with_locales = []
