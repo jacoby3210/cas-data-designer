@@ -1,0 +1,98 @@
+[
+  {
+    "id": 0,
+    "label": "ENTITY_",
+    "name": 0,
+    "desc": 0,
+    "note": 0,
+    "type": 0
+  },
+  {
+    "id": 1,
+    "label": "ENTITY_1",
+    "name": 46,
+    "desc": 47,
+    "note": 48,
+    "type": 1
+  },
+  {
+    "id": 2,
+    "label": "ENTITY_2",
+    "name": 49,
+    "desc": 50,
+    "note": 51,
+    "type": 2
+  },
+  {
+    "id": 3,
+    "label": "ENTITY_3",
+    "name": 52,
+    "desc": 53,
+    "note": 54,
+    "type": 3
+  },
+  {
+    "id": 4,
+    "label": "ENTITY_4",
+    "name": 55,
+    "desc": 56,
+    "note": 57,
+    "type": 4
+  },
+  {
+    "id": 5,
+    "label": "ENTITY_5",
+    "name": 58,
+    "desc": 59,
+    "note": 60,
+    "type": 5
+  },
+  {
+    "id": 6,
+    "label": "ENTITY_6",
+    "name": 61,
+    "desc": 62,
+    "note": 63,
+    "type": 6
+  },
+  {
+    "id": 7,
+    "label": "ENTITY_7",
+    "name": 64,
+    "desc": 65,
+    "note": 66,
+    "type": 0
+  },
+  {
+    "id": 8,
+    "label": "ENTITY_8",
+    "name": 67,
+    "desc": 68,
+    "note": 69,
+    "type": 0
+  },
+  {
+    "id": 9,
+    "label": "ENTITY_9",
+    "name": 70,
+    "desc": 71,
+    "note": 72,
+    "type": 0
+  },
+  {
+    "id": 10,
+    "label": "ENTITY_10",
+    "name": 73,
+    "desc": 74,
+    "note": 75,
+    "type": 0
+  },
+  {
+    "id": 11,
+    "label": "ENTITY_11",
+    "name": 76,
+    "desc": 77,
+    "note": 78,
+    "type": 0
+  }
+]
