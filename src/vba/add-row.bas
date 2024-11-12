@@ -51,6 +51,14 @@ Sub AddNewEntity()
 
     ' Доступ к текущей таблице
     Set table = GetTableAtCursor()
+    
+    ' Проверка, выбрана ли таблица
+    If table Is Nothing Then
+        MsgBox "Пожалуйста, выберите таблицу, в которой хотите добавить новую запись.", vbInformation
+        Exit Sub
+    End If
+
+    ' Добавление новой строки
     Set targetRow = table.ListRows.Add
 
     i = 1
@@ -75,4 +83,5 @@ Sub AddNewEntity()
 
         i = i + 1
     Next column
+
 End Sub
