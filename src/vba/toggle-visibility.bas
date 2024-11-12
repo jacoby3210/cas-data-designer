@@ -1,29 +1,31 @@
 Attribute VB_Name = "Module1"
-Sub ToggleVisibilityСolumnsWithLID()
+Sub ToggleVisibilityColumnsWithLID()
 
-    ' Переменные окружения
+    ' РџРµСЂРµРјРµРЅРЅС‹Рµ РѕРєСЂСѓР¶РµРЅРёСЏ
     Dim ws As Worksheet
     Dim settings As ListObject
     Dim column As ListColumn
     Dim newState As Boolean
     
-    ' Доступ к настройкам документа
-    Set settings = ThisWorkbook.Sheets("@core").ListObjects("settings")
+    ' Р”РѕСЃС‚СѓРї Рє РЅР°СЃС‚СЂРѕР№РєР°Рј РґРѕРєСѓРјРµРЅС‚Р°
+    Set settings = ActiveWorkbook.Sheets("@core").ListObjects("settings")
     Set column = settings.ListColumns("show_lid_columns")
+    
+    ' РџРµСЂРµРєР»СЋС‡РµРЅРёРµ СЃРѕСЃС‚РѕСЏРЅРёСЏ РІРёРґРёРјРѕСЃС‚Рё
     newState = Not column.DataBodyRange.Cells(1, 1).Value
     column.DataBodyRange.Cells(1, 1).Value = newState
     
-    ' Перебираем все листы в книге
-    For Each ws In ThisWorkbook.Sheets
+    ' РџРµСЂРµР±РёСЂР°РµРј РІСЃРµ Р»РёСЃС‚С‹ РІ РєРЅРёРіРµ
+    For Each ws In ActiveWorkbook.Sheets
+        Dim table As ListObject
         For Each table In ws.ListObjects
-           For Each column In table.ListColumns
-               If InStr(1, column.name, ":lid") Then
-                   column.Range.EntireColumn.Hidden = Not newState
-               End If
-           Next column
-       Next table
+            For Each column In table.ListColumns
+                ' РџСЂРѕРІРµСЂРєР°, СЃРѕРґРµСЂР¶РёС‚ Р»Рё РёРјСЏ СЃС‚РѕР»Р±С†Р° ":lid"
+                If InStr(1, column.Name, ":lid") Then
+                    column.Range.EntireColumn.Hidden = Not newState
+                End If
+            Next column
+        Next table
     Next ws
 
 End Sub
-
-
