@@ -1,63 +1,63 @@
 Attribute VB_Name = "Module2"
-' Получить таблицу в которой находится курсор
+
+' РџРѕР»СѓС‡РёС‚СЊ С‚Р°Р±Р»РёС†Сѓ, РІ РєРѕС‚РѕСЂРѕР№ РЅР°С…РѕРґРёС‚СЃСЏ РєСѓСЂСЃРѕСЂ
 Function GetTableAtCursor() As ListObject
-    ' Переменные окружения
     Dim activeTable As ListObject
-    
-    ' Проверяем, находится ли активная ячейка внутри таблицы
-    On Error Resume Next ' Игнорируем ошибку, если ячейка не внутри таблицы
+
+    ' РџСЂРѕРІРµСЂСЏРµРј, РЅР°С…РѕРґРёС‚СЃСЏ Р»Рё Р°РєС‚РёРІРЅР°СЏ СЏС‡РµР№РєР° РІРЅСѓС‚СЂРё С‚Р°Р±Р»РёС†С‹
+    On Error Resume Next ' РРіРЅРѕСЂРёСЂСѓРµРј РѕС€РёР±РєСѓ, РµСЃР»Рё СЏС‡РµР№РєР° РЅРµ РІРЅСѓС‚СЂРё С‚Р°Р±Р»РёС†С‹
     Set activeTable = ActiveCell.ListObject
-    On Error GoTo 0 ' Восстанавливаем обработку ошибок
-        
-    ' Возвращаем найденную таблицу или Nothing, если курсор не в таблице
+    On Error GoTo 0 ' Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј РѕР±СЂР°Р±РѕС‚РєСѓ РѕС€РёР±РѕРє
+
+    ' Р’РѕР·РІСЂР°С‰Р°РµРј РЅР°Р№РґРµРЅРЅСѓСЋ С‚Р°Р±Р»РёС†Сѓ РёР»Рё Nothing, РµСЃР»Рё РєСѓСЂСЃРѕСЂ РЅРµ РІ С‚Р°Р±Р»РёС†Рµ
     Set GetTableAtCursor = activeTable
 End Function
 
-' Получить id для следующей строки
-Function GetNextID(table) As Integer
-    ' Переменные окружения
+' РџРѕР»СѓС‡РёС‚СЊ id РґР»СЏ СЃР»РµРґСѓСЋС‰РµР№ СЃС‚СЂРѕРєРё
+Function GetNextID(table As ListObject) As Integer
     Dim name As String
     Dim ai As Integer
     Dim pos As Integer
-    
-    ' извлекам счётчик из имени столбца и увелчиваем его на единицу
-    name = table.ListColumns(1).name
+
+    ' РР·РІР»РµРєР°РµРј СЃС‡С‘С‚С‡РёРє РёР· РёРјРµРЅРё СЃС‚РѕР»Р±С†Р° Рё СѓРІРµР»РёС‡РёРІР°РµРј РµРіРѕ РЅР° РµРґРёРЅРёС†Сѓ
+    name = table.ListColumns(1).Name
     pos = InStr(1, name, ":")
     ai = CInt(Trim(Mid(name, pos + 1))) + 1
-    table.ListColumns(1).name = Left(name, pos - 1) + ":" + CStr(ai)
-    
-    ' Возвращаем текущее значение счётчика
+    table.ListColumns(1).Name = Left(name, pos - 1) + ":" + CStr(ai)
+
+    ' Р’РѕР·РІСЂР°С‰Р°РµРј С‚РµРєСѓС‰РµРµ Р·РЅР°С‡РµРЅРёРµ СЃС‡С‘С‚С‡РёРєР°
     GetNextID = ai
-    
 End Function
 
-' Получить locale id для следующей строки
+' РџРѕР»СѓС‡РёС‚СЊ locale id РґР»СЏ СЃР»РµРґСѓСЋС‰РµР№ СЃС‚СЂРѕРєРё
 Function GetNextLocaleID() As Integer
-    Set settings = ThisWorkbook.Sheets("@core").ListObjects("settings")
+    Dim settings As ListObject
+    Dim column As ListColumn
+
+    Set settings = ActiveWorkbook.Sheets("@core").ListObjects("settings")
     Set column = settings.ListColumns("ai_counter_locale_table")
     column.DataBodyRange.Cells(1, 1).Value = CInt(column.DataBodyRange.Cells(1, 1).Value) + 1
     GetNextLocaleID = column.DataBodyRange.Cells(1, 1).Value
 End Function
 
-' Добавление новой записи в таблицу
+' Р”РѕР±Р°РІР»РµРЅРёРµ РЅРѕРІРѕР№ Р·Р°РїРёСЃРё РІ С‚Р°Р±Р»РёС†Сѓ
 Sub AddNewEntity()
-    ' Переменные для работы функции
     Dim table As ListObject
     Dim column As ListColumn
     Dim targetRow As ListRow
     Dim defaultValue As Variant
     Dim cell As Range
     Dim i As Integer
-    
-    ' Доступ к текущей таблице.
+
+    ' Р”РѕСЃС‚СѓРї Рє С‚РµРєСѓС‰РµР№ С‚Р°Р±Р»РёС†Рµ
     Set table = GetTableAtCursor()
     Set targetRow = table.ListRows.Add
-    
+
     i = 1
     For Each column In table.ListColumns
         Set cell = targetRow.Range(1, i)
-        
-        ' Присвоение значений ячейкам в новой строке
+
+        ' РџСЂРёСЃРІРѕРµРЅРёРµ Р·РЅР°С‡РµРЅРёР№ СЏС‡РµР№РєР°Рј РІ РЅРѕРІРѕР№ СЃС‚СЂРѕРєРµ
         Select Case i
             Case 1
                 cell.Value = GetNextID(table)
@@ -65,16 +65,14 @@ Sub AddNewEntity()
                 defaultValue = column.DataBodyRange.Cells(1, 1).Value
                 cell.Value = defaultValue + CStr(targetRow.Range(1, 1).Value)
             Case Else
-                If InStr(1, column.name, ":lid") > 0 Then
+                If InStr(1, column.Name, ":lid") > 0 Then
                     cell.Value = GetNextLocaleID()
                 Else
-                    ' Копирование значения из первой ячейки столбца
+                    ' РљРѕРїРёСЂРѕРІР°РЅРёРµ Р·РЅР°С‡РµРЅРёСЏ РёР· РїРµСЂРІРѕР№ СЏС‡РµР№РєРё СЃС‚РѕР»Р±С†Р°
                     column.DataBodyRange.Cells(1, 1).Copy cell
                 End If
         End Select
-        
+
         i = i + 1
     Next column
-    
 End Sub
-
