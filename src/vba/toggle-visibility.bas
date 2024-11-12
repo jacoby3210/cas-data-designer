@@ -1,5 +1,3 @@
-Attribute VB_Name = "Module1"
-
 ' Toggle the visibility of columns with localized row IDs
 Sub ToggleVisibilityColumnsWithLID()
 

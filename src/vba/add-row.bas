@@ -1,5 +1,3 @@
-Attribute VB_Name = "Module.AddRow"
-
 ' Get the table where the cursor is located
 Function GetTableAtCursor() As ListObject
   Dim activeTable As ListObject
