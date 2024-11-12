@@ -2,56 +2,54 @@ import json
 import openpyxl
 import os
 
-# function for converting excel sheet to JSON
-def convert_table_to_json(table_name, table_data, json_locale_data):
-
-  # parsing table headers
+def get_column_indices(headers):
+  column_indices = {
+    "data": [],
+    "locales": [],
+    "refs": []
+  }
   column_names = []
-  column_indices_with_data = []
-  column_indices_with_locales = []
-  column_indices_with_refs = []
 
-  for i, header in enumerate(table_data[0]):
+  for i, header in enumerate(headers):
+    column_name, column_type = header.split(":")[0], header.split(":")[1].lower()
+    column_names.append(column_name)
 
-      column_names.append(header.split(":")[0])
-      column_type = header.split(":")[1]
+    if "formula" in column_type: continue
+    elif "ltext" in column_type: column_indices["locales"].append(i)
+    elif "ref" in column_type:   column_indices["refs"].append(i)
+    else:                        column_indices["data"].append(i)
 
-      if 'formula' in column_type.lower(): continue 
-      elif 'ltext' in column_type.lower(): column_indices_with_locales.append(i)
-      elif 'ref' in column_type.lower():   column_indices_with_refs.append(i)
-      else: column_indices_with_data.append(i)
+  return column_names, column_indices
 
-  # prepare data
+def convert_table_to_json(table_name, table_data, json_locale_data):
+  headers = table_data[0]
+  rows = table_data[1:]
+  column_names, column_indices = get_column_indices(headers)
+
   json_table_data = {}
-  for row in table_data[1:]:
-    
-    # handle sheet data 
-    json_table_data[row[0]] = (
-      {column_names[i]: row[i] for i in column_indices_with_data} | 
-      {column_names[i]: int(row[i].split(":")[0]) for i in column_indices_with_refs}
-    )
+  for row in rows:
+    row_data = {column_names[i]: row[i] for i in column_indices["data"] if row[i] is not None}
+    ref_data = {column_names[i]: int(row[i].split(":")[0]) for i in column_indices["refs"] if row[i] is not None}
+    json_table_data[row[0]] = {**row_data, **ref_data}
 
-    # handle locale data 
-    for i in column_indices_with_locales:
-      json_locale_data[row[i-1]] = {"text":row[i], "column": column_names[i], "table": table_name}
+    for i in column_indices["locales"]:
+      json_locale_data[row[i-1]] = {"text": row[i], "column": column_names[i], "table": table_name}
 
-  # write target json
   json_path = os.path.join(output_dir, f'{table_name}.json')
   with open(json_path, 'w', encoding='utf-8') as json_file:
     json.dump(json_table_data, json_file, ensure_ascii=False, indent=2)
-
   print(f'Table {table_name} successfully transformed into JSON')
-
-# parse workbook excel
 
 def parse_wb(wb_path):
   json_locale_data = {}
+  json_locale_path = os.path.join(output_dir, f'locale.json')
+  if os.path.exists(json_locale_path):
+    with open(json_locale_path, 'r', encoding='utf-8') as file:
+      json_locale_data = json.load(file)
+
   wb_handler = openpyxl.load_workbook(wb_path, keep_links=True, keep_vba=True)
 
-  # parse sheet excel
   for wb_sheet_name in wb_handler.sheetnames:
-    
-    # ignore sheets starting with the symbol '@'
     if wb_sheet_name.startswith('@'):
       print(f'Sheet {wb_sheet_name} skipped (starts with the @ symbol)')
       continue
@@ -62,24 +60,17 @@ def parse_wb(wb_path):
       table_data = [[cell.value for cell in row] for row in table_range]
       convert_table_to_json(table_name, table_data, json_locale_data)
 
-  json_locale_path = os.path.join(output_dir, f'locale.json')
   with open(json_locale_path, 'w', encoding='utf-8') as json_file:
     json.dump(json_locale_data, json_file, ensure_ascii=False, indent=2)
 
-# setup workflow
 input_dir = os.getcwd()
 output_dir = os.getcwd()
 
-# scan directory
 for root, dirs, files in os.walk(input_dir):
   for file in files:
     wb_file_path = os.path.join(root, file)
-
-    # skipping temporary files (files starting with '~' or '.')
     if file.startswith('~') or file.startswith('.'): continue
-
-    # skipping files with the wrong extension
-    if file.endswith('.xlsx') or file.endswith('.xls'):
+    if file.endswith('.xlsm') or file.endswith('.xls'):
       print(f'File detected {wb_file_path}')
       parse_wb(wb_file_path)
 
