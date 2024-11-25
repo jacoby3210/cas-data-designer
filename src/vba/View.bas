@@ -22,7 +22,7 @@ Sub ToggleVisibilityMode()
     For Each table In ws.ListObjects
       For Each column In table.ListColumns
         ' Check if the column name contains ":lid"
-        If InStr(1, column.name, ":lid") Then
+        If InStr(1, column.name, ":lid") Or InStr(1, column.name, "sig") Then
           column.Range.EntireColumn.Hidden = Not newState
         End If
       Next column
