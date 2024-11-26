@@ -1,5 +1,5 @@
 ' Main procedure to create a sheet and a table
-Sub CreateSheetWithTable()
+Sub ButtonCreateWorkSheet()
 
     ' Setup workflow
     Dim ws As Worksheet
@@ -23,10 +23,39 @@ Sub CreateSheetWithTable()
     Set ws = CreateSheet(name)
     
     ' Create the table on the new sheet
-    CreateTable ws, name
+    CreateTable ws, name, "A1"
     
     ' Notify the user
     MsgBox "Table created on sheet '" & ws.name & "'!", vbInformation, "Success"
+End Sub
+
+' Main procedure to create a table on current sheet
+Sub ButtonCreateTable()
+    
+    ' Setup workflow
+    Dim ws As Worksheet
+    Dim name As String
+    Dim lastRow As Long
+    Dim startCell As Range
+    
+    ' Get the new table name from the user
+    name = InputBox("Enter the name of the new table:", "Table Name", "NewTable")
+    If name = "" Then Exit Sub ' Exit if no input is provided
+    
+    Set ws = ActiveSheet
+    
+    ' Find the last row with data on the sheet
+    lastRow = ws.Cells(ActiveSheet.Rows.count, 1).End(xlUp).row
+
+    ' Define the starting cell for the new table (add 2 rows for spacing)
+    Set startCell = ws.Cells(lastRow + 2, 1)
+    
+    ' Create the table on the new sheet
+    CreateTable ws, name, startCell.address
+       
+    ' Notify the user
+    MsgBox "Table created on sheet '" & ws.name & "'!", vbInformation, "Success"
+    
 End Sub
 
 ' Function to create a new sheet
@@ -43,8 +72,7 @@ Function CreateSheet(sheetName As String) As Worksheet
     Set CreateSheet = ws
 End Function
 
-' Function to create a table and fill it with sample data
-Function CreateTable(ws As Worksheet, tableName As String)
+Function CreateTable(ws As Worksheet, tableName As String, cellRootAddress As String)
 
     ' Setup workflow
     Dim tbl As ListObject
@@ -52,6 +80,11 @@ Function CreateTable(ws As Worksheet, tableName As String)
     Dim data As Variant
     Dim columnWidths As Variant
     Dim row As Integer, col As Integer
+    Dim startRow As Long, startCol As Long
+    
+    ' Parse the starting cell address
+    startRow = ws.Range(cellRootAddress).row
+    startCol = ws.Range(cellRootAddress).column
     
     ' Sample data to populate the table
     data = Array( _
@@ -59,15 +92,15 @@ Function CreateTable(ws As Worksheet, tableName As String)
         Array("0", "ENTITY_", "'-", "Èìÿ", "'-", "Îïèñàíèå", "'-", "Ïðèìå÷àíèå", "=CONCAT(A1;"" : "";B1)") _
     )
     
-    ' Place the data into the sheet
+    ' Place the data into the sheet starting from the specified address
     For row = LBound(data) To UBound(data)
         For col = LBound(data(row)) To UBound(data(row))
-            ws.Cells(row + 1, col + 1).Value = data(row)(col) ' Place each value in the corresponding cell
+            ws.Cells(startRow + row, startCol + col).Value = data(row)(col) ' Place each value in the corresponding cell
         Next col
     Next row
     
-    ' Define the range for the table
-    Set rng = ws.Range("A1").CurrentRegion
+    ' Define the range for the table based on the data size
+    Set rng = ws.Range(ws.Cells(startRow, startCol), ws.Cells(startRow + UBound(data), startCol + UBound(data(0))))
     
     ' Create the table
     Set tbl = ws.ListObjects.Add(xlSrcRange, rng, , xlYes)
@@ -77,7 +110,11 @@ Function CreateTable(ws As Worksheet, tableName As String)
     columnWidths = Array(10, 25, 10, 10, 10, 50, 10, 50) ' Specify widths for each column
     
     For col = LBound(columnWidths) To UBound(columnWidths)
-        tbl.Range.Columns(col + 1).ColumnWidth = columnWidths(col)
+        If col + 1 <= tbl.ListColumns.count Then ' Prevent errors if more widths are defined than columns
+            tbl.Range.Columns(col + 1).ColumnWidth = columnWidths(col)
+        End If
     Next col
-    
+
 End Function
+
+
