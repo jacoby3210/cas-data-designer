@@ -1,71 +1,69 @@
-' Get the range to search for a value
-Function GetSearchRange() As Range
-    ' Check if the active cell has Data Validation
-    On Error Resume Next ' Handle cases where Validation is not present
-    validationFormula = activeCell.Validation.Formula1
-    On Error GoTo 0 ' Restore error handling
-    
-    ' Ensure validation is present
-    If validationFormula = "" Then
-        MsgBox "The active cell does not have Data Validation!", vbExclamation, "No Data Validation"
-        Exit Function
-    End If
-    
-    ' Check if validation is a range
-    If Not Left(validationFormula, 1) = "=" Then
-        MsgBox "Data Validation is not linked to a range.", vbExclamation, "Invalid Validation"
-        Exit Function
-    End If
-     
-    Set GetSearchRange = Range(Mid(validationFormula, 2))
-    
-End Function
+' Main procedure: handles navigation and propagates errors
+Sub ButtonGoToSourceCell()
+    On Error GoTo ErrorHandler ' Enable error handling for the procedure
 
-' Get a target cell with a search value
+    ' Find and select the target cell
+    Dim targetCell As Range
+    Set targetCell = GetTargetCell() ' May raise an error
+    
+    ' Select the row in the table
+    Call SelectTableRow(targetCell) ' May raise an error
+    
+    Exit Sub ' Exit successfully
+
+ErrorHandler:
+    ' Handle any errors from nested functions
+    MsgBox "Error: " & Err.Description, vbExclamation, "An Error Occurred"
+End Sub
+
+' Function to find the target cell based on validation
 Function GetTargetCell() As Range
+    Dim validationRange As Range
+    Dim targetCell As Range
+    Dim validationFormula As String
 
-    ' Setup the workflow
-    Dim searchRange As Range
-    Dim targetÑell As Range
-    
-    ' Search for the value in the range
-    Set searchRange = GetSearchRange()
-    Set targetÑell = searchRange.Find(What:=activeCell.Value, LookIn:=xlValues, LookAt:=xlWhole)
-        
-    ' Check if the value was found
-    If Not targetÑell Is Nothing Then
-        ' Select the found cell and show its address
-        targetÑell.Select
-        MsgBox "Value found at: " & targetÑell.Address, vbInformation, "Match Found"
+    On Error GoTo ErrorHandler ' Enable error handling for this function
+
+    ' Check if the active cell has Data Validation
+    If activeCell.Validation.Type = xlValidateList Then
+        validationFormula = activeCell.Validation.Formula1
     Else
-        MsgBox "Value not found in the validation range.", vbExclamation, "No Match Found"
+        Err.Raise vbObjectError + 513, "GetTargetCell", "Active cell does not have valid Data Validation."
     End If
-    
-    Set GetTargetCell = targetÑell
-    
+
+    ' Extract the validation range
+    If Left(validationFormula, 1) = "=" Then
+        Set validationRange = Range(Mid(validationFormula, 2))
+    Else
+        Err.Raise vbObjectError + 514, "GetTargetCell", "Data Validation is not linked to a range."
+    End If
+
+    ' Search for the value in the validation range
+    Set targetCell = validationRange.Find(What:=activeCell.Value, LookIn:=xlValues, LookAt:=xlWhole)
+    If targetCell Is Nothing Then
+        Err.Raise vbObjectError + 515, "GetTargetCell", "Value not found in the validation range."
+    End If
+
+    ' Return the found cell
+    Set GetTargetCell = targetCell
+    Exit Function
+
+ErrorHandler:
+    ' Raise the error to the calling procedure
+    Err.Raise Err.Number, "GetTargetCell", Err.Description
 End Function
 
-' Select the row to which the target cell belongs
-Function SelectTableRow(targetCell As Range)
-
-    ' Setup the workflow
+' Function to select the table row for a target cell
+Sub SelectTableRow(targetCell As Range)
     Dim table As ListObject
     Dim row As ListRow
 
-    ' Ensure the target cell is valid
-    If targetCell Is Nothing Then
-        MsgBox "Target cell is not specified!", vbExclamation, "Error"
-        Exit Function
-    End If
+    On Error GoTo ErrorHandler ' Enable error handling for this function
 
     ' Check if the target cell belongs to a table
-    On Error Resume Next
     Set table = targetCell.ListObject
-    On Error GoTo 0
-
     If table Is Nothing Then
-        MsgBox "The target cell does not belong to a table!", vbExclamation, "Error"
-        Exit Function
+        Err.Raise vbObjectError + 516, "SelectTableRow", "The target cell does not belong to a table."
     End If
 
     ' Get the table row that contains the target cell
@@ -74,18 +72,14 @@ Function SelectTableRow(targetCell As Range)
     ' Select the entire row of the table
     If Not row Is Nothing Then
         row.Range.Select
-        MsgBox "Selected row: " & row.Index, vbInformation, "Row Selected"
     Else
-        MsgBox "The target cell is not within the data body of the table!", vbExclamation, "Error"
+        Err.Raise vbObjectError + 517, "SelectTableRow", "The target cell is not within the data body of the table."
     End If
-End Function
 
-' Go to the source cell from the data validation
-Sub ButtonGoToSourceCell()
+    Exit Sub
 
-    Dim targetCell As Range
-    Set targetCell = GetTargetCell()
-    Call SelectTableRow(targetCell)
-    
+ErrorHandler:
+    ' Raise the error to the calling procedure
+    Err.Raise Err.Number, "SelectTableRow", Err.Description
 End Sub
 
