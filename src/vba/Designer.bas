@@ -31,6 +31,8 @@ End Sub
 
 ' Function to create a new sheet
 Function CreateSheet(sheetName As String) As Worksheet
+
+    ' Setup workflow
     Dim ws As Worksheet
     
     ' Create a new sheet
@@ -42,8 +44,9 @@ Function CreateSheet(sheetName As String) As Worksheet
 End Function
 
 ' Function to create a table and fill it with sample data
-Sub CreateTable(ws As Worksheet, tableName As String)
+Function CreateTable(ws As Worksheet, tableName As String)
 
+    ' Setup workflow
     Dim tbl As ListObject
     Dim rng As Range
     Dim data As Variant
@@ -77,5 +80,4 @@ Sub CreateTable(ws As Worksheet, tableName As String)
         tbl.Range.Columns(col + 1).ColumnWidth = columnWidths(col)
     Next col
     
-End Sub
-
+End Function

@@ -1,5 +1,7 @@
 ' Main procedure: handles navigation and propagates errors
 Sub ButtonGoToSourceCell()
+
+    ' Setup workflow
     On Error GoTo ErrorHandler ' Enable error handling for the procedure
 
     ' Find and select the target cell
@@ -18,6 +20,8 @@ End Sub
 
 ' Function to find the target cell based on validation
 Function GetTargetCell() As Range
+
+    ' Setup workflow
     Dim validationRange As Range
     Dim targetCell As Range
     Dim validationFormula As String
@@ -55,6 +59,8 @@ End Function
 
 ' Function to select the table row for a target cell
 Sub SelectTableRow(targetCell As Range)
+
+    ' Setup workflow
     Dim table As ListObject
     Dim row As ListRow
 
@@ -82,4 +88,3 @@ ErrorHandler:
     ' Raise the error to the calling procedure
     Err.Raise Err.Number, "SelectTableRow", Err.Description
 End Sub
-

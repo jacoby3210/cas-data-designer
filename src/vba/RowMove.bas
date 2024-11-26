@@ -1,24 +1,23 @@
 ' Check if the rows in the collection are consecutive
-Function AreRowsConsecutive(selectedRows As Range, offset As Long) As Boolean
+Function AreSequentialRows(selectedRows As Range, offset As Long) As Boolean
 
     ' Setup the workflow
-    Dim selectedRowNums As Collection
+    Dim selectedRowIndices As Collection
         
     ' Collect row numbers of selected cells
-    Set selectedRowNums = New Collection
+    Set selectedRowIndices = New Collection
     For Each cell In selectedRows.Rows
-        rowNum = cell.row - offset
-        selectedRowNums.Add rowNum
+        selectedRowIndices.Add cell.row - offset
     Next cell
     
     Dim i As Integer
-    For i = 2 To selectedRowNums.count
-        If selectedRowNums(i) <> selectedRowNums(i - 1) + 1 Then
-            AreRowsConsecutive = False
+    For i = 2 To selectedRowIndices.count
+        If selectedRowIndices(i) <> selectedRowIndices(i - 1) + 1 Then
+            AreSequentialRows = False
             Exit Function
         End If
     Next i
-    AreRowsConsecutive = True
+    AreSequentialRows = True
 
 End Function
 
@@ -26,63 +25,60 @@ End Function
 Function RowMove(offset As Integer)
 
     ' Setup the workflow
-    Dim rng As Range
-    Dim tbl As ListObject
-    Dim firstRow As Long
-    Dim lastRow As Long
+    Dim table As ListObject
     Dim selectedRows As Range
-    Dim targetRow As Long
+    Dim firstSelectedRowIndex As Long
+    Dim lastSelectedRowIndex As Long
+    Dim targetRowIndex As Long
 
-    On Error Resume Next
+    On Error GoTo ErrorHandler
 
     ' Get the selected cells and table
-    Set rng = Selection
-    Set tbl = rng.ListObject
-
-    If tbl Is Nothing Then
-        MsgBox "The selection must be within a table!", vbExclamation, "Error"
-        Exit Function
+    Set table = Selection.ListObject
+    If table Is Nothing Then
+        Err.Raise 1001, "RowMove", "The selection must be within a table!"
     End If
-    On Error GoTo 0
 
     ' Determine the selected rows and validate the selection
-    Set selectedRows = Intersect(rng, tbl.DataBodyRange)
+    Set selectedRows = Intersect(Selection, table.DataBodyRange)
     If selectedRows Is Nothing Then
-        MsgBox "The selection must include rows of the table!", vbExclamation, "Error"
-        Exit Function
+        Err.Raise 1002, "RowMove", "The selection must include rows of the table!"
     End If
 
     ' Check if rows are consecutive
-    If Not AreRowsConsecutive(selectedRows, tbl.HeaderRowRange.row) Then
-        MsgBox "Selected rows must be consecutive!", vbExclamation, "Error"
-        Exit Function
+    If Not AreSequentialRows(selectedRows, table.HeaderRowRange.row) Then
+        Err.Raise 1003, "RowMove", "Selected rows must be consecutive!"
     End If
 
     ' Get the first and last selected row within the table
-    firstRow = selectedRows.Rows(1).row - tbl.HeaderRowRange.row
-    lastRow = tbl.ListRows.count
+    firstSelectedRowIndex = selectedRows.Rows(1).row - table.HeaderRowRange.row
+    lastSelectedRowIndex = table.ListRows.count
 
     ' Check if the rows can be moved
-    If firstRow + offset < 1 Or firstRow + offset + selectedRows.Rows.count - 1 > lastRow Then
-        MsgBox "Cannot move rows beyond the table boundaries!", vbExclamation, "Error"
-        Exit Function
+    If firstSelectedRowIndex + offset < 1 Or firstSelectedRowIndex + offset + selectedRows.Rows.count - 1 > lastSelectedRowIndex Then
+        Err.Raise 1004, "RowMove", "Cannot move rows beyond the table boundaries!"
     End If
 
     ' Determine the target row for the cut range
     If offset > 0 Then
         ' Moving down: Insert after the target range
-        targetRow = firstRow + offset + selectedRows.Rows.count
+        targetRowIndex = firstSelectedRowIndex + offset + selectedRows.Rows.count
     Else
         ' Moving up: Insert before the target range
-        targetRow = firstRow + offset
+        targetRowIndex = firstSelectedRowIndex + offset
     End If
 
     ' Move rows
     Application.ScreenUpdating = False
-    tbl.ListRows(firstRow).Range.Resize(selectedRows.Rows.count).Cut
-    tbl.ListRows(targetRow).Range.Insert Shift:=xlDown
+    table.DataBodyRange.Rows(firstSelectedRowIndex).Resize(selectedRows.Rows.count).Cut
+    table.ListRows(targetRowIndex).Range.Insert Shift:=xlDown
     Application.ScreenUpdating = True
 
+    Exit Function
+
+ErrorHandler:
+    MsgBox "Error: " & Err.Description, vbExclamation, "Error"
+    Err.Clear
 End Function
 
 ' Button for moving rows up
