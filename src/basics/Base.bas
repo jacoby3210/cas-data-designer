@@ -45,7 +45,7 @@ Sub ButtonCreateTable()
     Set ws = ActiveSheet
     
     ' Find the last row with data on the sheet
-    lastRow = ws.Cells(ActiveSheet.Rows.count, 1).End(xlUp).row
+    lastRow = ws.Cells(ActiveSheet.rows.count, 1).End(xlUp).row
 
     ' Define the starting cell for the new table (add 2 rows for spacing)
     Set startCell = ws.Cells(lastRow + 2, 1)
@@ -88,7 +88,7 @@ Function CreateTable(ws As Worksheet, tableName As String, cellRootAddress As St
     
     ' Sample data to populate the table
     data = Array( _
-        Array("id:1", "label", "name:lid", "name:ltext", "desc:lid", "desc:ltext", "note:lid", "note:ltext", "sig:formula"), _
+        Array("id:1", "label:label", "name:lid", "name:ltext", "desc:lid", "desc:ltext", "note:lid", "note:ltext", "sig:formula"), _
         Array("0", "ENTITY_", "'-", "Èìÿ", "'-", "Îïèñàíèå", "'-", "Ïðèìå÷àíèå", "=CONCAT(A1;"" : "";B1)") _
     )
     
@@ -116,5 +116,3 @@ Function CreateTable(ws As Worksheet, tableName As String, cellRootAddress As St
     Next col
 
 End Function
-
-
