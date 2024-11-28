@@ -6,7 +6,7 @@ Function AreSequentialRows(selectedRows As Range, offset As Long) As Boolean
         
     ' Collect row numbers of selected cells
     Set selectedRowIndices = New Collection
-    For Each cell In selectedRows.Rows
+    For Each cell In selectedRows.rows
         selectedRowIndices.Add cell.row - offset
     Next cell
     
@@ -51,18 +51,18 @@ Function RowMove(offset As Integer)
     End If
 
     ' Get the first and last selected row within the table
-    firstSelectedRowIndex = selectedRows.Rows(1).row - table.HeaderRowRange.row
+    firstSelectedRowIndex = selectedRows.rows(1).row - table.HeaderRowRange.row
     lastSelectedRowIndex = table.ListRows.count
 
     ' Check if the rows can be moved
-    If firstSelectedRowIndex + offset < 1 Or firstSelectedRowIndex + offset + selectedRows.Rows.count - 1 > lastSelectedRowIndex Then
+    If firstSelectedRowIndex + offset < 1 Or firstSelectedRowIndex + offset + selectedRows.rows.count - 1 > lastSelectedRowIndex Then
         Err.Raise 1004, "RowMove", "Cannot move rows beyond the table boundaries!"
     End If
 
     ' Determine the target row for the cut range
     If offset > 0 Then
         ' Moving down: Insert after the target range
-        targetRowIndex = firstSelectedRowIndex + offset + selectedRows.Rows.count
+        targetRowIndex = firstSelectedRowIndex + offset + selectedRows.rows.count
     Else
         ' Moving up: Insert before the target range
         targetRowIndex = firstSelectedRowIndex + offset
@@ -70,7 +70,7 @@ Function RowMove(offset As Integer)
 
     ' Move rows
     Application.ScreenUpdating = False
-    table.DataBodyRange.Rows(firstSelectedRowIndex).Resize(selectedRows.Rows.count).Cut
+    table.DataBodyRange.rows(firstSelectedRowIndex).Resize(selectedRows.rows.count).Cut
     table.ListRows(targetRowIndex).Range.Insert Shift:=xlDown
     Application.ScreenUpdating = True
 

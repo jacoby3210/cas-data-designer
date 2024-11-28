@@ -61,8 +61,8 @@ Function GetTargetCell() As Range
     On Error GoTo ErrorHandler ' Enable error handling for this function
 
     ' Check if the active cell has Data Validation
-    If activeCell.Validation.Type = xlValidateList Then
-        validationFormula = activeCell.Validation.Formula1
+    If ActiveCell.Validation.Type = xlValidateList Then
+        validationFormula = ActiveCell.Validation.Formula1
     Else
         Err.Raise vbObjectError + 513, "GetTargetCell", "Active cell does not have valid Data Validation."
     End If
@@ -75,7 +75,7 @@ Function GetTargetCell() As Range
     End If
 
     ' Search for the value in the validation range
-    Set targetCell = validationRange.Find(What:=activeCell.Value, LookIn:=xlValues, LookAt:=xlWhole)
+    Set targetCell = validationRange.Find(What:=ActiveCell.Value, LookIn:=xlValues, LookAt:=xlWhole)
     If targetCell Is Nothing Then
         Err.Raise vbObjectError + 515, "GetTargetCell", "Value not found in the validation range."
     End If

@@ -1,90 +1,162 @@
-' Main procedure: handles navigation and propagates errors
-Sub ButtonGoToSourceCell()
-
+' Main procedure: add multiple entities into end of the current table
+Sub ButtonMultiple()
+    
     ' Setup workflow
-    On Error GoTo ErrorHandler ' Enable error handling for the procedure
-
-    ' Find and select the target cell
-    Dim targetCell As Range
-    Set targetCell = GetTargetCell() ' May raise an error
+    On Error GoTo ErrorHandler ' Enable error handling
     
-    ' Select the row in the table
-    Call SelectTableRow(targetCell) ' May raise an error
+    ' Access the current table
+    Dim table As ListObject: Set table = GetTableAtCursor()
     
-    Exit Sub ' Exit successfully
+    ' Prompt the user to input the number of rows to add & validate the input
+    Dim rowCountInput As Variant:
+        rowCountInput = InputBox("Enter the count of rows to add:", "Add New Rows", 5)
+        
+    If Not IsNumeric(rowCountInput) Then
+        MsgBox "Invalid input. Please enter a numeric value.", vbCritical
+        Exit Sub
+    End If
 
+    ' Type assignment & Ensure rowCount is at least 1
+    Dim rowCountInteger As Integer: rowCountInteger = CInt(rowCountInput)
+    If rowCountInteger < 1 Then
+        MsgBox "The number of rows must be at least 1.", vbInformation
+        Exit Sub
+    End If
+    
+    ' Add rows
+    AddRows table, rowCountInteger
+    
+    MsgBox rowCountInteger & " rows added successfully.", vbInformation
+    Exit Sub
+    
+    ' Handle errors raised in the function
 ErrorHandler:
-    ' Handle any errors from nested functions
-    MsgBox "Error: " & Err.Description, vbExclamation, "An Error Occurred"
+    
+    MsgBox "Error: " & Err.Description, vbExclamation
 End Sub
 
-' Function to find the target cell based on validation
-Function GetTargetCell() As Range
-
+' Main procedure: add single entite into the end of current table
+Sub ButtonSingle()
+    
     ' Setup workflow
-    Dim validationRange As Range
-    Dim targetCell As Range
-    Dim validationFormula As String
-
-    On Error GoTo ErrorHandler ' Enable error handling for this function
-
-    ' Check if the active cell has Data Validation
-    If activeCell.Validation.Type = xlValidateList Then
-        validationFormula = activeCell.Validation.Formula1
-    Else
-        Err.Raise vbObjectError + 513, "GetTargetCell", "Active cell does not have valid Data Validation."
-    End If
-
-    ' Extract the validation range
-    If Left(validationFormula, 1) = "=" Then
-        Set validationRange = Range(Mid(validationFormula, 2))
-    Else
-        Err.Raise vbObjectError + 514, "GetTargetCell", "Data Validation is not linked to a range."
-    End If
-
-    ' Search for the value in the validation range
-    Set targetCell = validationRange.Find(What:=activeCell.Value, LookIn:=xlValues, LookAt:=xlWhole)
-    If targetCell Is Nothing Then
-        Err.Raise vbObjectError + 515, "GetTargetCell", "Value not found in the validation range."
-    End If
-
-    ' Return the found cell
-    Set GetTargetCell = targetCell
-    Exit Function
-
+    On Error GoTo ErrorHandler ' Enable error handling
+    
+    ' Access the current table
+    Dim table As ListObject: Set table = GetTableAtCursor()
+    
+    
+    ' Add rows
+    AddRows table, 1
+    
+    MsgBox rowCountInteger & " rows added successfully.", vbInformation
+    Exit Sub
+    
+    ' Handle errors raised in the function
 ErrorHandler:
-    ' Raise the error to the calling procedure
-    Err.Raise Err.Number, "GetTargetCell", Err.Description
+    
+    MsgBox "Error: " & Err.Description, vbExclamation
+End Sub
+' Get the ID for the next row
+Function GetNextTableID(table As ListObject) As Integer
+
+    Dim name As String: name = table.ListColumns(1).name
+    Dim pos As Integer: pos = InStr(1, name, ":")
+    GetNextTableID = CInt(Trim(Mid(name, pos + 1)))
+
 End Function
 
-' Function to select the table row for a target cell
-Sub SelectTableRow(targetCell As Range)
+' Set the ID for the next row
+Function SetNextTableID(table As ListObject, ai As Integer) As Integer
 
+    ' Setup Workflow
+    Dim name As String
+    Dim pos As Integer
+
+    ' Extract counter from column name and increment it by one
+    name = table.ListColumns(1).name
+    pos = InStr(1, name, ":")
+    table.ListColumns(1).name = Left(name, pos - 1) + ":" + CStr(ai)
+
+End Function
+
+' Get Default value for cell in added row
+Function GetDefaultValue(table As ListObject, column As Integer) As Variant
+    
     ' Setup workflow
-    Dim table As ListObject
-    Dim row As ListRow
-
-    On Error GoTo ErrorHandler ' Enable error handling for this function
-
-    ' Check if the target cell belongs to a table
-    Set table = targetCell.ListObject
-    If table Is Nothing Then
-        Err.Raise vbObjectError + 516, "SelectTableRow", "The target cell does not belong to a table."
-    End If
-
-    ' Get the table row that contains the target cell
-    Set row = table.ListRows(targetCell.row - table.HeaderRowRange.row)
-
-    ' Select the entire row of the table
-    If Not row Is Nothing Then
-        row.Range.Select
+    Dim cell As Range
+    Set cell = table.ListColumns(column).DataBodyRange.Cells(1, 1)
+    
+    ' Check for formula or value
+    If cell.HasFormula Then
+        If cell.FormulaR1C1 <> "" Then
+            GetDefaultValue = cell.FormulaR1C1
+        Else
+            GetDefaultValue = cell.Formula
+        End If
     Else
-        Err.Raise vbObjectError + 517, "SelectTableRow", "The target cell is not within the data body of the table."
+        GetDefaultValue = cell.Value
     End If
+    
+End Function
 
-    Exit Sub
+' Add multiple entities to the current table
+Function AddRows(tableData As ListObject, count As Integer)
+    
+    ' Setup workflow
+    Dim dataArray() As Variant
+    Dim defaultValue As Variant
+    Dim row As Integer, column As Integer
+    
+    Dim tableLocale As ListObject:
+        Set tableLocale = ActiveWorkbook.Sheets("@core").ListObjects("locale")
+        
+    Dim nextTableID As Integer:
+        nextTableID = GetNextTableID(tableData)
+    Dim nextLocaleID As Integer:
+        nextLocaleID = GetNextTableID(tableLocale)
 
-ErrorHandler:
-    ' Raise the error to the calling procedure
-    Err.Raise Err.Number, "SelectTableRow", Err.Description
-End Sub
+    ' Resize the array to hold all the rows we need to add
+    ReDim dataArray(1 To count, 1 To tableData.ListColumns.count)
+
+    ' Add specified number of rows
+    For row = 1 To count
+        tableData.ListRows.Add
+        For column = 1 To tableData.ListColumns.count
+        
+            defaultValue = GetDefaultValue(tableData, column)
+            Select Case column
+                Case 1
+                    ' Set value for the first column (ID)
+                    dataArray(row, column) = nextTableID
+                    nextTableID = nextTableID + 1
+                Case 2
+                    dataArray(row, column) = defaultValue + CStr(nextTableID - 1)
+                Case Else
+                    If InStr(1, tableData.ListColumns(column).name, ":lid") > 0 Then
+                        dataArray(row, column) = nextLocaleID
+                        nextLocaleID = nextLocaleID + 1
+                    Else
+                        dataArray(row, column) = defaultValue
+                    End If
+            End Select
+        Next column
+    Next row
+    
+    tableData.DataBodyRange.Cells(tableData.ListRows.count - count + 1, 1).Resize(count, tableData.ListColumns.count).Value = dataArray
+    SetNextTableID tableData, nextTableID
+    SetNextTableID tableLocale, nextLocaleID
+    
+End Function
+
+' Get the table where the cursor is located
+Function GetTableAtCursor() As ListObject
+  Dim activeTable As ListObject
+
+  ' Check if the active cell is within a table
+  On Error Resume Next ' Ignore error if cell is not inside a table
+    Set activeTable = ActiveCell.ListObject
+  On Error GoTo 0 ' Restore error handling
+
+  ' Return the found table or Nothing if the cursor is not in a table
+  Set GetTableAtCursor = activeTable
+End Function
