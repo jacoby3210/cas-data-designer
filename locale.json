@@ -1,0 +1,17 @@
+{
+  "-": {
+    "text": "Name",
+    "column": "name",
+    "table": "NewTabley"
+  },
+  "Name": {
+    "text": "Description",
+    "column": "desc",
+    "table": "NewTabley"
+  },
+  "Description": {
+    "text": "Note",
+    "column": "note",
+    "table": "NewTabley"
+  }
+}

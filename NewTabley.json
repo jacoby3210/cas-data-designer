@@ -1,0 +1,10 @@
+{
+  "0": {
+    "id": 0,
+    "label": "ENTITY_",
+    "signature": "=_xlfn.CONCAT(A5,\" : \",B5)",
+    "name": "-",
+    "desc": "-",
+    "note": "-"
+  }
+}
