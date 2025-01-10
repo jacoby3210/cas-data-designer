@@ -5,7 +5,12 @@
     "name": 0,
     "desc": 1,
     "note": 2,
-    "modifiers": "[[1,9]]",
+    "modifiers": [
+      [
+        1,
+        9
+      ]
+    ],
     "test": 0
   },
   "1": {
@@ -14,7 +19,12 @@
     "name": 3,
     "desc": 4,
     "note": 5,
-    "modifiers": "[[1,9]]",
+    "modifiers": [
+      [
+        1,
+        9
+      ]
+    ],
     "test": 0
   },
   "2": {
@@ -23,7 +33,12 @@
     "name": 6,
     "desc": 7,
     "note": 8,
-    "modifiers": "[[1,9]]",
+    "modifiers": [
+      [
+        1,
+        9
+      ]
+    ],
     "test": 0
   },
   "3": {
@@ -32,7 +47,12 @@
     "name": 9,
     "desc": 10,
     "note": 11,
-    "modifiers": "[[1,9]]",
+    "modifiers": [
+      [
+        1,
+        9
+      ]
+    ],
     "test": 0
   },
   "4": {
@@ -41,7 +61,12 @@
     "name": 12,
     "desc": 13,
     "note": 14,
-    "modifiers": "[[1,9]]",
+    "modifiers": [
+      [
+        1,
+        9
+      ]
+    ],
     "test": 0
   },
   "5": {
@@ -50,7 +75,16 @@
     "name": 15,
     "desc": 16,
     "note": 17,
-    "modifiers": "[[1,9], [2,5]]",
+    "modifiers": [
+      [
+        1,
+        9
+      ],
+      [
+        2,
+        5
+      ]
+    ],
     "test": 0
   }
 }
