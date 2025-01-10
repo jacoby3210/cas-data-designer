@@ -1,0 +1,16 @@
+{
+  "0": {
+    "id": 0,
+    "label": "ENTITY_",
+    "name": 0,
+    "desc": 1,
+    "note": 2
+  },
+  "1": {
+    "id": 1,
+    "label": "ENTITY_1",
+    "name": 57,
+    "desc": 58,
+    "note": 59
+  }
+}

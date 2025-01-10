@@ -1,0 +1,142 @@
+{
+  "0": {
+    "id": 0,
+    "label": "ENTITY_",
+    "name": 0,
+    "desc": 1,
+    "note": 2
+  },
+  "1": {
+    "id": 1,
+    "label": "ENTITY_1",
+    "name": 39,
+    "desc": 40,
+    "note": 41
+  },
+  "2": {
+    "id": 2,
+    "label": "ENTITY_2",
+    "name": 42,
+    "desc": 43,
+    "note": 44
+  },
+  "3": {
+    "id": 3,
+    "label": "ENTITY_3",
+    "name": 45,
+    "desc": 46,
+    "note": 47
+  },
+  "4": {
+    "id": 4,
+    "label": "ENTITY_4",
+    "name": 48,
+    "desc": 49,
+    "note": 50
+  },
+  "5": {
+    "id": 5,
+    "label": "ENTITY_5",
+    "name": 51,
+    "desc": 52,
+    "note": 53
+  },
+  "6": {
+    "id": 6,
+    "label": "ENTITY_6",
+    "name": 54,
+    "desc": 55,
+    "note": 56
+  },
+  "7": {
+    "id": 7,
+    "label": "ENTITY_7",
+    "name": 75,
+    "desc": 76,
+    "note": 77
+  },
+  "8": {
+    "id": 8,
+    "label": "ENTITY_8",
+    "name": 78,
+    "desc": 79,
+    "note": 80
+  },
+  "9": {
+    "id": 9,
+    "label": "ENTITY_9",
+    "name": 81,
+    "desc": 82,
+    "note": 83
+  },
+  "10": {
+    "id": 10,
+    "label": "ENTITY_10",
+    "name": 84,
+    "desc": 85,
+    "note": 86
+  },
+  "11": {
+    "id": 11,
+    "label": "ENTITY_11",
+    "name": 87,
+    "desc": 88,
+    "note": 89
+  },
+  "12": {
+    "id": 12,
+    "label": "ENTITY_12",
+    "name": 90,
+    "desc": 91,
+    "note": 92
+  },
+  "13": {
+    "id": 13,
+    "label": "ENTITY_13",
+    "name": 93,
+    "desc": 94,
+    "note": 95
+  },
+  "14": {
+    "id": 14,
+    "label": "ENTITY_14",
+    "name": 171,
+    "desc": 172,
+    "note": 173
+  },
+  "15": {
+    "id": 15,
+    "label": "ENTITY_15",
+    "name": 174,
+    "desc": 175,
+    "note": 176
+  },
+  "16": {
+    "id": 16,
+    "label": "ENTITY_16",
+    "name": 177,
+    "desc": 178,
+    "note": 179
+  },
+  "17": {
+    "id": 17,
+    "label": "ENTITY_17",
+    "name": 180,
+    "desc": 181,
+    "note": 182
+  },
+  "18": {
+    "id": 18,
+    "label": "ENTITY_18",
+    "name": 183,
+    "desc": 184,
+    "note": 185
+  },
+  "19": {
+    "id": 19,
+    "label": "ENTITY_19",
+    "name": 186,
+    "desc": 187,
+    "note": 188
+  }
+}

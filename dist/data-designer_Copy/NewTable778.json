@@ -1,0 +1,51 @@
+{
+  "0": {
+    "id": 0,
+    "label": "ENTITY_",
+    "name": 0,
+    "desc": 1,
+    "note": 2
+  },
+  "1": {
+    "id": 1,
+    "label": "ENTITY_1",
+    "name": 96,
+    "desc": 97,
+    "note": 98
+  },
+  "2": {
+    "id": 2,
+    "label": "ENTITY_2",
+    "name": 99,
+    "desc": 100,
+    "note": 101
+  },
+  "3": {
+    "id": 3,
+    "label": "ENTITY_3",
+    "name": 102,
+    "desc": 103,
+    "note": 104
+  },
+  "4": {
+    "id": 4,
+    "label": "ENTITY_4",
+    "name": 105,
+    "desc": 106,
+    "note": 107
+  },
+  "5": {
+    "id": 5,
+    "label": "ENTITY_5",
+    "name": 108,
+    "desc": 109,
+    "note": 110
+  },
+  "6": {
+    "id": 6,
+    "label": "ENTITY_6",
+    "name": 111,
+    "desc": 112,
+    "note": 113
+  }
+}
